@@ -191,12 +191,12 @@ impl<'a, 'b> CursorLines<'a, 'b> {
 }
 
 impl<'a> Iterator for CursorLines<'a, '_> {
-    type Item = (usize, usize, &'a str);
+    type Item = (usize, &'a str);
 
     fn next(&mut self) -> Option<Self::Item> {
         let line = self.cursor.line();
         let ret = self.cursor.next_line()?;
-        Some((self.cursor.line(), line, ret))
+        Some((line, ret))
     }
 }
 
