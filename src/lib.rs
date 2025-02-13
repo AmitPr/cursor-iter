@@ -61,6 +61,21 @@ impl<'a> Cursor<'a> {
         }
     }
 
+    pub fn peek_line(&mut self) -> Option<(usize, &'a str)> {
+        let start = self.offset;
+        for (_, c) in self.forward.clone() {
+            if is_newline(c) {
+                break;
+            }
+        }
+        let end = self.offset;
+        if start < end {
+            Some((start, &self.data[start..end]))
+        } else {
+            None
+        }
+    }
+
     fn skip_whitespace(&mut self) {
         while let Some((_, c)) = self.peek() {
             if !c.is_whitespace() {
