@@ -47,6 +47,22 @@ impl<'a> Cursor<'a> {
         }
     }
 
+    pub fn next_line(&mut self) -> Option<&'a str> {
+        let start = self.offset;
+        while let Some((_, c)) = self.peek() {
+            if is_newline(c) {
+                break;
+            }
+            self.next();
+        }
+        let end = self.offset;
+        if start < end {
+            Some(&self.data[start..=end])
+        } else {
+            None
+        }
+    }
+
     fn skip_whitespace(&mut self) {
         while let Some((_, c)) = self.peek() {
             if !c.is_whitespace() {
@@ -104,6 +120,10 @@ impl<'a> Cursor<'a> {
     pub const fn words_with_lines(&mut self) -> CursorWords<'a, '_, true> {
         CursorWords::with_lines(self)
     }
+
+    pub const fn lines(&mut self) -> CursorLines<'a, '_> {
+        CursorLines::new(self)
+    }
 }
 
 impl Iterator for Cursor<'_> {
@@ -157,6 +177,26 @@ impl<'a> Iterator for CursorWords<'a, '_, true> {
         let (offset, word) = self.cursor.next_word()?;
         self.cursor.skip_whitespace();
         Some((offset, line, word))
+    }
+}
+
+pub struct CursorLines<'a, 'b> {
+    cursor: &'b mut Cursor<'a>,
+}
+
+impl<'a, 'b> CursorLines<'a, 'b> {
+    pub const fn new(cursor: &'b mut Cursor<'a>) -> Self {
+        Self { cursor }
+    }
+}
+
+impl<'a> Iterator for CursorLines<'a, '_> {
+    type Item = (usize, usize, &'a str);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let line = self.cursor.line();
+        let ret = self.cursor.next_line()?;
+        Some((self.cursor.line(), line, ret))
     }
 }
 
