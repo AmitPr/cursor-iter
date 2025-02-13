@@ -33,15 +33,14 @@ impl<'a> Cursor<'a> {
 
     pub fn next_word(&mut self) -> Option<(usize, &'a str)> {
         let start = self.offset;
-        while let Some((_, c)) = self.peek() {
+        for (_, c) in self.by_ref() {
             if c.is_whitespace() {
                 break;
             }
-            self.next();
         }
         let end = self.offset;
         if start < end {
-            Some((start, &self.data[start..=end]))
+            Some((start, &self.data[start..end]))
         } else {
             None
         }
@@ -49,15 +48,14 @@ impl<'a> Cursor<'a> {
 
     pub fn next_line(&mut self) -> Option<(usize, &'a str)> {
         let start = self.offset;
-        while let Some((_, c)) = self.peek() {
+        for (_, c) in self.by_ref() {
             if is_newline(c) {
                 break;
             }
-            self.next();
         }
         let end = self.offset;
         if start < end {
-            Some((start, &self.data[start..=end]))
+            Some((start, &self.data[start..end]))
         } else {
             None
         }
