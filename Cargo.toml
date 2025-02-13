@@ -2,5 +2,9 @@
 name = "cursor-iter"
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/AmitPr/cursor-iter"
+description = "Nicer string iteration"
+license = "MIT"
+
 
 [dependencies]
