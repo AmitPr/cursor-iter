@@ -47,7 +47,7 @@ impl<'a> Cursor<'a> {
         }
     }
 
-    pub fn next_line(&mut self) -> Option<&'a str> {
+    pub fn next_line(&mut self) -> Option<(usize, &'a str)> {
         let start = self.offset;
         while let Some((_, c)) = self.peek() {
             if is_newline(c) {
@@ -57,7 +57,7 @@ impl<'a> Cursor<'a> {
         }
         let end = self.offset;
         if start < end {
-            Some(&self.data[start..=end])
+            Some((start, &self.data[start..=end]))
         } else {
             None
         }
@@ -191,12 +191,12 @@ impl<'a, 'b> CursorLines<'a, 'b> {
 }
 
 impl<'a> Iterator for CursorLines<'a, '_> {
-    type Item = (usize, &'a str);
+    type Item = (usize, usize, &'a str);
 
     fn next(&mut self) -> Option<Self::Item> {
         let line = self.cursor.line();
-        let ret = self.cursor.next_line()?;
-        Some((line, ret))
+        let (off, ret) = self.cursor.next_line()?;
+        Some((off, line, ret))
     }
 }
 
